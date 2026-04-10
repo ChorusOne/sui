@@ -125,6 +125,11 @@ pub async fn fix_indexes(authority_state: Weak<AuthorityState>) -> Result<()> {
                             tracing::info!("Authority is shutting down, stopped fixing coin index");
                             return Ok(vec![]);
                         }
+                        // Avoid spamming the logs, while keeping a frequent step size to keep operators informed
+                        // of this ongoing background task
+                        if i % 50000 == 0 {
+                            tracing::info!("Evaluating coin index {}", i);
+                        }
                     }
                     let (coin_index_key, _) = entry?;
                     if is_violation(&coin_index_key, &authority) {
